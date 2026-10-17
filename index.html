@@ -1,0 +1,189 @@
+html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Pengenceran HNO3 68%</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4; /* Warna hijau sangat muda (emerald-50) */
+        }
+        /* Kustomisasi scrollbar untuk tampilan yang lebih rapi */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10b981; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #059669; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Kontainer Utama -->
+    <main class="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden border border-emerald-100">
+        
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-emerald-600 to-green-500 p-6 text-white text-center">
+            <h1 class="text-2xl font-bold mb-2">Kalkulator Pengenceran HNO3</h1>
+            <p class="text-emerald-100 text-sm font-medium">Sistem Fertigasi Greenhouse Melon</p>
+        </header>
+
+        <div class="p-6 md:p-8 space-y-6">
+            
+            <!-- Kotak Peringatan Keselamatan -->
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <!-- Icon Alert SVG -->
+                        <svg class="h-5 w-5 text-red-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-bold text-red-800">PERHATIAN KESELAMATAN (Acid to Water)</h3>
+                        <p class="mt-1 text-sm text-red-700 leading-relaxed">
+                            Selalu tuangkan <strong>ASAM ke dalam AIR</strong>. Jangan pernah menuangkan air ke dalam asam pekat untuk menghindari reaksi eksotermik (panas mendadak/ledakan percikan) yang berbahaya.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Input -->
+            <div class="space-y-4">
+                <div>
+                    <label for="totalVolume" class="block text-sm font-semibold text-gray-700 mb-1">Total Volume Akhir yang Diinginkan (Liter)</label>
+                    <div class="relative">
+                        <input type="number" id="totalVolume" min="0.1" step="0.1" placeholder="Contoh: 50" 
+                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-3 pr-12 text-gray-900 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-colors outline-none"
+                            oninput="calculateDilution()">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-500 font-medium">
+                            L
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="targetConcentration" class="block text-sm font-semibold text-gray-700 mb-1">Target Konsentrasi Akhir (%)</label>
+                    <div class="relative">
+                        <input type="number" id="targetConcentration" min="0.1" max="67" step="0.1" placeholder="Contoh: 10" 
+                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-3 pr-12 text-gray-900 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-colors outline-none"
+                            oninput="calculateDilution()">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-500 font-medium">
+                            %
+                        </div>
+                    </div>
+                    <p id="errorMsg" class="text-red-500 text-xs mt-1 hidden font-medium">Konsentrasi target harus di bawah 68%</p>
+                </div>
+            </div>
+
+            <!-- Area Hasil (Real-time) -->
+            <div class="mt-8">
+                <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3">Hasil Kebutuhan Pencampuran</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
+                    <!-- Card Hasil Asam -->
+                    <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200 flex flex-col justify-center items-center text-center">
+                        <span class="text-emerald-800 text-xs font-bold uppercase tracking-wide mb-1">Pekatan HNO3 68%</span>
+                        <div class="flex items-baseline space-x-1">
+                            <span id="resultHno3" class="text-3xl font-extrabold text-emerald-600">0.00</span>
+                            <span class="text-emerald-700 font-medium">Liter</span>
+                        </div>
+                    </div>
+
+                    <!-- Card Hasil Air -->
+                    <div class="bg-blue-50 rounded-xl p-4 border border-blue-200 flex flex-col justify-center items-center text-center">
+                        <span class="text-blue-800 text-xs font-bold uppercase tracking-wide mb-1">Air Bersih / Baku</span>
+                        <div class="flex items-baseline space-x-1">
+                            <span id="resultWater" class="text-3xl font-extrabold text-blue-600">0.00</span>
+                            <span class="text-blue-700 font-medium">Liter</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-gray-50 border-t border-gray-100 p-4 text-center">
+            <p class="text-xs text-gray-500 font-medium">
+                💡 Aplikasi ini dirancang dan dikalibrasi khusus untuk <span class="font-bold text-gray-700">Asam Nitrat (HNO3) dengan konsentrasi awal 68%</span>.
+            </p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Konstanta untuk HNO3 68%
+        const M1_HNO3 = 15.33; // Molaritas HNO3 68%
+        const MR_HNO3 = 63.01; // Massa molar HNO3
+
+        function calculateDilution() {
+            // Ambil elemen DOM
+            const totalVolumeInput = document.getElementById('totalVolume');
+            const targetConcentrationInput = document.getElementById('targetConcentration');
+            const resultHno3 = document.getElementById('resultHno3');
+            const resultWater = document.getElementById('resultWater');
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Ambil nilai dan parsing ke float
+            const totalVolume = parseFloat(totalVolumeInput.value);
+            const targetConcentration = parseFloat(targetConcentrationInput.value);
+
+            // Validasi Input Kosong atau Nol
+            if (isNaN(totalVolume) || isNaN(targetConcentration) || totalVolume <= 0 || targetConcentration <= 0) {
+                resultHno3.textContent = "0.00";
+                resultWater.textContent = "0.00";
+                errorMsg.classList.add('hidden');
+                return;
+            }
+
+            // Validasi Logika Konsentrasi
+            if (targetConcentration >= 68) {
+                errorMsg.classList.remove('hidden');
+                resultHno3.textContent = "0.00";
+                resultWater.textContent = "0.00";
+                return;
+            } else {
+                errorMsg.classList.add('hidden');
+            }
+
+            // --- PROSES PERHITUNGAN ---
+            
+            // 1. Hitung Molaritas Target (M2)
+            // Rumus yang digunakan sesuai request: (Target Konsentrasi * 10) / 63.01
+            const m2 = (targetConcentration * 10) / MR_HNO3;
+
+            // 2. Hitung Volume HNO3 68% yang dibutuhkan (V1)
+            // V1 * M1 = V2 * M2  => V1 = (V2 * M2) / M1
+            const volumeHno3 = (totalVolume * m2) / M1_HNO3;
+
+            // 3. Hitung Volume Air yang dibutuhkan
+            const volumeWater = totalVolume - volumeHno3;
+
+            // Tampilkan hasil dengan format 2 angka di belakang koma
+            // Jika hasilnya negatif (tidak mungkin jika validasi benar), set ke 0
+            if (volumeWater < 0) {
+                resultHno3.textContent = "Error";
+                resultWater.textContent = "Error";
+            } else {
+                resultHno3.textContent = volumeHno3.toFixed(2);
+                resultWater.textContent = volumeWater.toFixed(2);
+            }
+        }
+    </script>
+</body>
+</html>
